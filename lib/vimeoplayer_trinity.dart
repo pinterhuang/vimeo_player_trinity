@@ -16,6 +16,9 @@ class VimeoPlayer extends StatefulWidget {
   /// Whether player should loop video
   final bool looping;
 
+  /// Initial video volume
+  final double? volume;
+
   /// Start playing in fullscreen.default is false
   final bool fullScreenByDefault;
 
@@ -23,7 +26,7 @@ class VimeoPlayer extends StatefulWidget {
   final BoxFit fullscreenVideoFit;
 
   /// Configure controls
-  final ControlsConfig? controlsConfig;
+  final BetterPlayerControlsConfiguration? controlsConfig;
 
   /// Progress indicator color
   final Color? loaderColor;
@@ -40,6 +43,7 @@ class VimeoPlayer extends StatefulWidget {
     this.loaderBackgroundColor,
     this.fullScreenByDefault = false,
     this.fullscreenVideoFit = BoxFit.contain,
+    this.volume,
     Key? key,
   })  : assert(id != null, 'Video ID can not be null'),
         super(key: key);
@@ -86,13 +90,17 @@ class _VimeoPlayerState extends State<VimeoPlayer> {
             autoPlay: widget.autoPlay,
             looping: widget.looping,
             fullScreenByDefault: fullScreenByDefault,
-            controlsConfiguration:
-                widget.controlsConfig == null ? ControlsConfig() : widget.controlsConfig as ControlsConfig,
+            controlsConfiguration: widget.controlsConfig == null
+                ? BetterPlayerControlsConfiguration()
+                : widget.controlsConfig as BetterPlayerControlsConfiguration,
             fit: widget.fullscreenVideoFit,
             autoDetectFullscreenAspectRatio: true,
           ),
           betterPlayerDataSource: betterPlayerDataSource,
         );
+        if (widget.volume != null) {
+          _betterPlayerController?.setVolume(widget.volume!);
+        }
       });
 
       //Update orientation and rebuilding page
@@ -113,6 +121,7 @@ class _VimeoPlayerState extends State<VimeoPlayer> {
   //Build player element
   @override
   Widget build(BuildContext context) {
+    print("[DEBUG] vimeo player build");
     return _betterPlayerController == null
         ? AspectRatio(
             aspectRatio: 16 / 9,
@@ -129,10 +138,22 @@ class _VimeoPlayerState extends State<VimeoPlayer> {
   }
 
   @override
+  void didChangeDependencies() {
+    print("[DEBUG] vimeo player didChangeDependencies");
+    super.didChangeDependencies();
+  }
+
+  @override
+  void deactivate() {
+    print("[DEBUG] vimeo player deactivate");
+    super.deactivate();
+  }
+
+  @override
   void dispose() {
+    print("[DEBUG] vimeo player dispose");
     // _controller.dispose();
     // initFuture = null;
-
     super.dispose();
   }
 }
